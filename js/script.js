@@ -14,7 +14,7 @@ var attribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenS
 
 // this object is empty, but when we call getJSON(), we'll set it to the result
 var globalData;
-var selectedYear; 
+var selectedYear = "abs15"; 
 
 //listen for clicks on the dropdown
 $("ul.dropdown-menu li a").click(function(e) {
@@ -61,12 +61,12 @@ function brewer2(d) {
 }
 
 //added a 2nd argument to style() so we can get different fill colors depending on which property we are styling
-function style(featureData, selectedYear) {
+function style(featureData) {
 
   //first time it runs, use 'abs15'
-  if (!selectedYear) {
-    selectedYear = "abs15";
-  }
+  // if (!selectedYear) {
+  //   selectedYear = "abs15";
+  // }
 
   return {
       fillColor: brewer2(featureData.properties[selectedYear]),
@@ -79,10 +79,10 @@ function style(featureData, selectedYear) {
 }
 
 function infoHelper(selectedYear) {
-  //first time it runs, use 'abs15'
-  if (!selectedYear) {
-    selectedYear = "abs15";
-  }
+  // //first time it runs, use 'abs15'
+  // if (!selectedYear) {
+  //   selectedYear = "abs15";
+  // }
   document.getElementById("res").innerHTML = selectedYear;
   return selectedYear;
 }
@@ -96,8 +96,9 @@ info2.onAdd = function(map) {
 };
 
 info2.update = function(properties) {
+  console.log(selectedYear);
   this._div.innerHTML = '<h4>Immigration in 2015</h4>' +  (properties ?
-    '<b>' + properties.SOVEREIGNT + '</b><br />' + properties["abs15"]
+    '<b>' + properties.SOVEREIGNT + '</b><br />' + properties[selectedYear]
     : 'Hover over a state');
 };
 
@@ -122,7 +123,8 @@ function mouseover2(e) {
 
 //this runs on mouseout
 function reset2(e) {
-  geo2.resetStyle(e.target);
+  console.log(e.target);
+  e.target.setStyle(style(e.target.feature));
 }
 
 //this is executed once for each feature in the data, and adds listeners
