@@ -14,19 +14,22 @@ var attribution = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenS
 
 // this object is empty, but when we call getJSON(), we'll set it to the result
 var globalData;
+var selectedYear; 
 
 //listen for clicks on the dropdown
 $("ul.dropdown-menu li a").click(function(e) {
   selectedYear = e.target.id;
 
-  //iterate over each layer (polygon) in the geojson, call setStyle() on each, pass in 2nd argument with whatever property the user selected
+  //iterate over each layer (polygon) in the geojson, 
+  //call setStyle() on each, pass in 2nd argument with 
+  //whatever property the user selected
   geo2.eachLayer(function (layer) {  
       layer.setStyle(style(layer.feature, selectedYear)) 
   });
-
+  infoHelper(selectedYear);
 });
 
-
+infoHelper(selectedYear);
 
 ///////////////////////////////////////////////////////////////////////
 // Map 2                                                             //
@@ -58,21 +61,77 @@ function brewer2(d) {
 }
 
 //added a 2nd argument to style() so we can get different fill colors depending on which property we are styling
-function style(featureData, property) {
+function style(featureData, selectedYear) {
 
   //first time it runs, use 'abs15'
-  if (!property) {
-    property = "abs15";
+  if (!selectedYear) {
+    selectedYear = "abs15";
   }
 
   return {
-      fillColor: brewer2(featureData.properties[property]),
+      fillColor: brewer2(featureData.properties[selectedYear]),
       weight: 2,
       opacity: 1,
       color: 'white',
       dashArray: '3',
       fillOpacity: 0.7
   };
+}
+
+function infoHelper(selectedYear) {
+  //first time it runs, use 'abs15'
+  if (!selectedYear) {
+    selectedYear = "abs15";
+  }
+  document.getElementById("res").innerHTML = selectedYear;
+  return selectedYear;
+}
+//control that shows state info on hover
+var info2 = L.control();
+
+info2.onAdd = function(map) {
+  this._div = L.DomUtil.create('div', 'info');
+  this.update();
+  return this._div;
+};
+
+info2.update = function(properties) {
+  this._div.innerHTML = '<h4>Immigration in 2015</h4>' +  (properties ?
+    '<b>' + properties.SOVEREIGNT + '</b><br />' + properties["abs15"]
+    : 'Hover over a state');
+};
+
+info2.addTo(map2);
+
+
+//this function is set to run when a user mouses over any polygon
+function mouseover2(e) {
+  var layer = e.target;
+  layer.setStyle({
+      weight: 2,
+      color: '#666',
+      dashArray: '',
+      fillOpacity: 0.7
+  });
+
+  if (!L.Browser.ie && !L.Browser.opera) {
+      layer.bringToFront();
+  }
+  info2.update(layer.feature.properties);
+}
+
+//this runs on mouseout
+function reset2(e) {
+  geo2.resetStyle(e.target);
+}
+
+//this is executed once for each feature in the data, and adds listeners
+function done2(feature, layer) {
+  layer.on({
+      mouseover: mouseover2,
+      mouseout: reset2
+      //click: zoomToFeature
+  });
 }
 
 
@@ -84,5 +143,30 @@ $.getJSON('data/allData.geojson', function(allData) {
   globalData = allData
   geo2 = L.geoJson(allData,{
     style: style,
+    onEachFeature: done2
   }).addTo(map2);
 });
+
+var legend2 = L.control({position: 'bottomright'});
+
+legend2.onAdd = function(map) {
+
+  var div = L.DomUtil.create('div', 'info legend'),
+    grades = [0, 1000, 5000, 10000, 30000, 50000, 75000, 100000],
+    labels = [],
+    from, to;
+
+  for (var i = 0; i < grades.length; i++) {
+    from = grades[i];
+    to = grades[i + 1];
+
+    labels.push(
+      '<i style="background:' + brewer2(from + 1) + '"></i> ' +
+      from + (to ? ' &ndash; ' + to : '+'));
+  }
+
+  div.innerHTML = labels.join('<br>');
+  return div;
+};
+
+legend2.addTo(map2);
