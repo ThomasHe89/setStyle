@@ -14,7 +14,9 @@
 </head>
 
 <body>
+<!-- no more dropdown (use buttons instead, one click less...) -->
         <div id="map2" class="map"></div>
+<!-- 
     <div class="dropdown">
       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Year
       <span class="caret"></span></button>
@@ -29,9 +31,37 @@
         <li><a href="#" id="abs08">2008</a></li>
       </ul>
     </div>
+-->
+<!-- Here is the btn-group (looks better IMO) -->
+<div id="yearSelect2" class="btn-group" data-toggle="buttons">
+  <label class="btn btn-primary active">
+    <input type="radio" name="options" id="abs15" autocomplete="off" checked> 2015
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="options" id="abs14" autocomplete="off"> 2014
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="options" id="abs13" autocomplete="off"> 2013
+  </label>
+  <label class="btn btn-primary">
+   <input type="radio" name="options" id="abs12" autocomplete="off"> 2012
+  </label>
+  <label class="btn btn-primary">
+   <input type="radio" name="options" id="abs11" autocomplete="off"> 2011
+  </label>
+  <label class="btn btn-primary">
+   <input type="radio" name="options" id="abs10" autocomplete="off"> 2010
+  </label>
+  <label class="btn btn-primary">
+   <input type="radio" name="options" id="abs09" autocomplete="off"> 2009
+  </label>
+  <label class="btn btn-primary">
+   <input type="radio" name="options" id="abs08" autocomplete="off"> 2008
+  </label>
+</div>
 
-   <!-- now unnecessary -->
-      <p id="res"></p>
+<!-- now unnecessary -->
+<!-- <p id="res"></p> -->
 
   <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
   <script src ="https://code.jquery.com/jquery-2.2.1.js"></script>
